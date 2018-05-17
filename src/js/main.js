@@ -1,312 +1,251 @@
-/* global MTRK, Power4, Strong, FixedSticky */
+/* global MTRK, Power4, _onClose  */
+// Strong, FixedSticky
 
-/**
- * @module MTRK
- * @class Layer Utility to create modal windows
- * @param  {Object} app   Global module
- * @param  {Object} utils Utilities module
- * @param  {Object} d     Document object
- * @return {Object}       Layer class
- */
-(function(app, utils, d) {
+import { TweenMax, TimelineLite } from 'gsap'
+import { Flickity } from 'flickity'
+const $ = require('jquery')(
+  /**
+   * @module MTRK
+   * @class Layer Utility to create modal windows
+   * @param  {Object} app   Global module
+   * @param  {Object} utils Utilities module
+   * @param  {Object} d     Document object
+   * @return {Object}       Layer class
+   */
+  (function (app, utils, d) {
+    let Layer
+    let templates
 
-    "use strict";
-
-    var Layer,
-        _onClose,
-        templates,
-        ESC;
-
-    ESC = 27;
-
-    templates = app.HtmlTemplates;
-
+    const ESC = 27
     Layer = {
+      baseOptions: {
+        /**
+         * @property {Boolean} dynamic Tell if content is taken from an ajax request
+         */
+        dynamic: false,
 
-        baseOptions: {
-            /**
-             * @property {Boolean} dynamic Tell if content is taken from an ajax request
-             */
-            dynamic: false,
+        dynamicTplName: 'layer',
+        tplData: {},
 
-            dynamicTplName: "layer",
+        context: 'body',
 
-            tplData: {},
+        rootEl: 'html',
 
-            context: "body",
-
-            rootEl: "html",
-
-            id: "layer",
-
-            /**
-             * klass Additional class to be added to root element
-             * @type {String}
-             */
-            klass: "waiting",
-
-            btnClose: ".js-close-layer",
-
-            dimClass: "is-dimmed",
-
-            WAIT: 2 * 1000,
-
-            onAfterOpen: $.noop,
-
-            onAfterClose: $.noop
-
-        },
-
-        settings: {},
+        id: 'layer',
 
         /**
-         * @method simpleBlocker
+         * klass Additional class to be added to root element
+         * @type {String}
          */
-        simpleBlocker: function() {
+        klass: 'waiting',
 
-            return templates.get("blocker");
+        btnClose: '.js-close-layer',
 
-        },
+        dimClass: 'is-dimmed',
 
-        /**
-         * @method dynamicContent
-         * @param {Object} data Data to fill the template with
-         */
-        dynamicContent: function(data) {
+        WAIT: 2 * 1000,
 
-            return templates.set(this.settings.dynamicTplName, data);
+        onAfterOpen: $.noop,
 
-        },
+        onAfterClose: $.noop
+      },
 
-        /**
-         * @method setUplayer
-         * @param {String} layer Flattened template to be append to DOM node
-         */
-        setUplayer: function(layer) {
+      settings: {},
 
-            var def = $.Deferred();
+      /**
+       * @method simpleBlocker
+       */
+      simpleBlocker () {
+        return templates.get('blocker')
+      },
 
-            $(this.settings.rootEl)
-                .addClass(this.settings.dimClass)
-                .addClass(this.settings.klass);
+      /**
+       * @method dynamicContent
+       * @param {Object} data Data to fill the template with
+       */
+      dynamicContent (data) {
+        return templates.set(this.settings.dynamicTplName, data)
+      },
 
-            $(this.settings.context).append(layer);
+      /**
+       * @method setUplayer
+       * @param {String} layer Flattened template to be append to DOM node
+       */
+      setUplayer (layer) {
+        const def = $.Deferred()
 
-            def.resolve(function() {
-                $(this.settings.context).append(layer);
-            }.bind(this));
+        $(this.settings.rootEl)
+          .addClass(this.settings.dimClass)
+          .addClass(this.settings.klass)
 
-            return def.promise();
+        $(this.settings.context).append(layer)
 
-        },
+        def.resolve(() => {
+          $(this.settings.context).append(layer)
+        })
 
-        /**
-         * @method writeLayer
-         * @param  {String} data Content to be printed into template
-         */
-        writeLayer: function(data) {
+        return def.promise()
+      },
 
-            var body, layer;
+      /**
+       * @method writeLayer
+       * @param  {String} data Content to be printed into template
+       */
+      writeLayer (data) {
+        let body, layer
 
-            body = {
-                content: data
-            };
-
-            layer = (typeof data !== "undefined") ? this.dynamicContent(body) : this.simpleBlocker();
-
-            this.setUplayer(layer).then(this.settings.onAfterOpen.bind(this));
-
-        },
-
-        /**
-         * @method clear Remove layer node and reset default class to root element
-         * @param  {Object} layer Layer node
-         * @param  {Object} rootEl Root node
-         */
-        clear: function(layer, rootEl) {
-
-            layer.remove();
-
-            rootEl
-                .removeClass(this.settings.klass)
-                .removeClass(this.settings.dimClass);
-
-            this.settings.onAfterClose();
-
-        },
-
-        /**
-         * @method removeLayer
-         * @param {Boolean} immediately Whether or not to remove layer ASAP
-         */
-        removeLayer: function(immediately) {
-
-            var $layer = $("#" + this.settings.id),
-                $rootEl = $(this.settings.rootEl);
-
-            if (immediately) {
-
-                this.clear($layer, $rootEl);
-
-            } else {
-
-                $layer.addClass("is-removing");
-
-                $layer.on("transitionend", this.clear.bind(this, $layer, $rootEl));
-
-            }
-
-            this.removeListener();
-
-        },
-
-        /**
-         * @method onClose Manage layer closing logic.
-         * Close the layer when:
-         * - clicking outside its content
-         * - pressing ESC on keyboard
-         * @param  {Object} evt jQuery Event object
-         */
-        onClose: function(evt) {
-
-            var $target = $(evt.target);
-
-            if (evt.type === "click") {
-
-                if ($target.hasClass("layer")) {
-
-                    this.removeLayer();
-
-                } else if ($target.hasClass("js-close-layer")) {
-
-                    this.removeLayer();
-                }
-
-            } else if (evt.type === "keydown") {
-
-                if (evt.keyCode === ESC) {
-
-                    this.removeLayer();
-
-                }
-
-            }
-
-        },
-
-        /**
-         * @method removeListener Detach event listener
-         */
-        removeListener: function() {
-
-            d.removeEventListener("click", _onClose, false);
-
-            d.removeEventListener("keydown", _onClose, false);
-        },
-
-        /**
-         * @method eventHandler Register event listener
-         */
-        eventHandler: function() {
-
-            d.addEventListener("click", _onClose, false);
-
-            d.addEventListener("keydown", _onClose, false);
-
-        },
-
-        onError: function() {
-            console.log("fail", arguments);
-        },
-
-        /**
-         * @method init
-         */
-        init: function(opt) {
-
-            /**
-             * _onClose Store a class-wide reference to `onClose` method,
-             * in order to pass it to add/remove EventListener
-             * @type {Object}
-             */
-            _onClose = this.onClose.bind(this);
-
-            this.settings = $.extend({}, this.baseOptions, opt || {});
-
-            if (this.settings.dynamic) {
-
-                this.writeLayer(this.settings.tplData);
-
-            } else {
-
-                this.writeLayer();
-
-            }
-
-            this.eventHandler();
-
+        body = {
+          content: data
         }
 
-    };
+        layer =
+          typeof data !== 'undefined' ? this.dynamicContent(body) : this.simpleBlocker()
+        this.setUplayer(layer).then(this.settings.onAfterOpen.bind(this))
+      },
 
-    app.Layer = Layer;
+      /**
+       * @method clear Remove layer node and reset default class to root element
+       * @param  {Object} layer Layer node
+       * @param  {Object} rootEl Root node
+       */
+      clear (layer, rootEl) {
+        layer.remove()
 
-})(MTRK, MTRK._UTILS_, document); // end Layer
+        rootEl
+          .removeClass(this.settings.klass)
+          .removeClass(this.settings.dimClass)
+
+        this.settings.onAfterClose()
+      },
+
+      /**
+       * @method removeLayer
+       * @param {Boolean} immediately Whether or not to remove layer ASAP
+       */
+      removeLayer (immediately) {
+        let $layer = $(`#${this.settings.id}`)
+        let $rootEl = $(this.settings.rootEl)
+
+        if (immediately) {
+          this.clear($layer, $rootEl)
+        } else {
+          $layer.addClass('is-removing')
+
+          $layer.on('transitionend', this.clear.bind(this, $layer, $rootEl))
+        }
+
+        this.removeListener()
+      },
+
+      /**
+       * @method onClose Manage layer closing logic.
+       * Close the layer when:
+       * - clicking outside its content
+       * - pressing ESC on keyboard
+       * @param  {Object} evt jQuery Event object
+       */
+      onClose (evt) {
+        const $target = $(evt.target)
+
+        if (evt.type === 'click') {
+          if ($target.hasClass('layer')) {
+            this.removeLayer()
+          } else if ($target.hasClass('js-close-layer')) {
+            this.removeLayer()
+          }
+        } else if (evt.type === 'keydown') {
+          if (evt.keyCode === ESC) {
+            this.removeLayer()
+          }
+        }
+      },
+
+      /**
+       * @method removeListener Detach event listener
+       */
+      removeListener () {
+        d.removeEventListener('click', _onClose, false)
+
+        d.removeEventListener('keydown', _onClose, false)
+      },
+
+      /**
+       * @method eventHandler Register event listener
+       */
+      eventHandler () {
+        d.addEventListener('click', _onClose, false)
+
+        d.addEventListener('keydown', _onClose, false)
+      },
+
+      onError () {
+        console.log('fail', arguments)
+      },
+
+      /**
+       * @method init
+       */
+      init (opt) {
+        /**
+         * _onClose Store a class-wide reference to `onClose` method,
+         * in order to pass it to add/remove EventListener
+         * @type {Object}
+         */
+        _onClose = this.onClose.bind(this)
+
+        this.settings = $.extend({}, this.baseOptions, opt || {})
+
+        if (this.settings.dynamic) {
+          this.writeLayer(this.settings.tplData)
+        } else {
+          this.writeLayer()
+        }
+
+        this.eventHandler()
+      }
+    }
+
+    app.Layer = Layer
+  })(MTRK, MTRK._UTILS_, document)
+) // end Layer
 
 /**
  * @module MTRK
  * @class handleGlobalAjax Handler for global ajax events:
  * print and remove a UI blocker overlay when an ajax call is fired/completed.
  * @param  {Object} app Global app object
- * @param  {Object} d 	window.document
+ * @param  {Object} d window.document
  * @return {Object}     Public API
  */
-MTRK.handleGlobalAjax = (function(app, d) {
+MTRK.handleGlobalAjax = (function (app, d) {
+  let $d, _onAjaxStart, _onAjaxError, _onAjaxComplete
 
-    "use strict";
+  $d = $(d)
 
-    var $d,
-        _onAjaxStart,
-        _onAjaxError,
-        _onAjaxComplete;
+  _onAjaxStart = app.loading
 
-    $d = $(d);
+  _onAjaxComplete = app.loaded
 
-    _onAjaxStart = app.loading;
+  _onAjaxError = function () {
+    console.log('_onAjaxError')
+  }
 
-    _onAjaxComplete = app.loaded;
+  return {
+    init () {
+      $d.ajaxStart(() => {
+        _onAjaxStart()
+      })
 
-    _onAjaxError = function() {
-        console.log("_onAjaxError");
-    };
+      $d.ajaxComplete(() => {
+        _onAjaxComplete()
+      })
 
-    return {
-
-        init: function() {
-
-            $d.ajaxStart(function() {
-
-                _onAjaxStart();
-
-            });
-
-            $d.ajaxComplete(function() {
-
-                _onAjaxComplete();
-
-            });
-
-            $d.ajaxError(function() {
-
-                _onAjaxError();
-
-            });
-
-        }
-
-    };
-
-})(MTRK, window.document);
+      $d.ajaxError(() => {
+        _onAjaxError()
+      })
+    }
+  }
+})(MTRK, window.document)
 
 /**
  * @module MTRK
@@ -314,44 +253,34 @@ MTRK.handleGlobalAjax = (function(app, d) {
  * @param  {Object} app         App global module
  * @return {Object}             Public API
  */
-MTRK.TabsCallbacks = (function(app) {
+MTRK.TabsCallbacks = (function (app) {
+  let $panels, $svgWrapper
 
-    "use strict";
+  $panels = $('.grid__item')
 
-    var $panels,
-        $svgWrapper;
+  $svgWrapper = $('.svg-wrapper')
 
-    $panels = $(".grid__item");
-
-    $svgWrapper = $(".svg-wrapper");
-
-    return {
-
-        showcase: function() {
-
-            TweenMax.staggerTo($panels, 0.25, {
-                scale: 1,
-                opacity: 1,
-                delay: 0,
-                ease: Power4.easeOut
-            }, 0.1);
-
+  return {
+    showcase () {
+      TweenMax.staggerTo(
+        $panels,
+        0.25, {
+          scale: 1,
+          opacity: 1,
+          delay: 0,
+          ease: Power4.easeOut
         },
+        0.1
+      )
+    },
 
-        gallery: function() {
+    gallery () {},
 
-
-        },
-
-        partecipate: function() {
-
-            $svgWrapper.addClass("is-visible");
-
-        }
-
-    };
-
-})(MTRK); // end TabsCallbacks
+    partecipate () {
+      $svgWrapper.addClass('is-visible')
+    }
+  }
+})(MTRK) // end TabsCallbacks
 
 /**
  * @module MTRK
@@ -359,64 +288,50 @@ MTRK.TabsCallbacks = (function(app) {
  * @param  {Object} app           App global module
  * @param  {Object} events        Events map
  * @param  {Object} tabsCallbacks Callbacks wrapper
- * @param  {Object} topic 		  Pub/sub utility
+ * @param  {Object} topic Pub/sub utility
  * @return {Object}               Public API
  */
-MTRK.BusinessEventListener = (function(app, events, tabsCallbacks, topic) {
+MTRK.BusinessEventListener = (function (app, events, tabsCallbacks, topic) {
+  let tabSelected = events.tabs.selected
+  let _onTabSelected
+  let _onPageScrolled
 
-    "use strict";
+  _onPageScrolled = function (hash) {
+    switch (hash) {
+      case 'showcase':
+        tabsCallbacks.showcase()
 
-    var tabSelected = events.tabs.selected,
-        _onTabSelected,
-        _onPageScrolled;
+        break
 
-    _onPageScrolled = function(hash) {
+      case 'gallery':
+        tabsCallbacks.gallery()
 
-        switch (hash) {
+        break
 
-            case "showcase":
+      case 'partecipate':
+        tabsCallbacks.partecipate()
 
-                tabsCallbacks.showcase();
+        break
 
-                break;
+      default:
+        break
+    }
+  }
 
-            case "gallery":
+  _onTabSelected = function (target, hash) {
+    hash = hash.replace('#', '')
 
-                tabsCallbacks.gallery();
+    app.scrollToPos({
+      target
+    },
+    () => {
+      _onPageScrolled(hash)
+    }
+    )
+  }
 
-                break;
-
-            case "partecipate":
-
-                tabsCallbacks.partecipate();
-
-
-                break;
-
-            default:
-
-                break;
-        }
-
-    };
-
-    _onTabSelected = function(target, hash) {
-
-        hash = hash.replace("#", "");
-
-        app.scrollToPos({
-            target: target
-        }, function() {
-
-            _onPageScrolled(hash);
-
-        });
-
-    };
-
-    topic(tabSelected).subscribe(_onTabSelected);
-
-})(MTRK, MTRK._EVENTS_, MTRK.TabsCallbacks, $.Topic); // end BusinessEventListener
+  topic(tabSelected).subscribe(_onTabSelected)
+})(MTRK, MTRK._EVENTS_, MTRK.TabsCallbacks, $.Topic) // end BusinessEventListener
 
 /**
  * @module MTRK
@@ -424,76 +339,61 @@ MTRK.BusinessEventListener = (function(app, events, tabsCallbacks, topic) {
  * @type {Object}
  */
 MTRK.SliderInit = {
+  hasSlides (selector) {
+    return $(selector).length
+  },
 
-    hasSlides: function(selector) {
+  slider: null,
 
-        return $(selector).length;
+  init (wrapper, options) {
+    let defaults
+    let settings
 
-    },
-
-    slider: null,
-
-    init: function(wrapper, options) {
-
-        var defaults, settings, slider;
-
-        defaults = {
-            wrapAround: true,
-            pageDots: false,
-            cellAlign: "left"
-        };
-
-        settings = $.extend({}, defaults, options);
-
-        if (this.hasSlides(settings.cellSelector)) {
-
-            slider = new Flickity(wrapper, settings);
-
-            this.slider = Flickity.data(wrapper);
-
-        }
-
-        return this;
-
+    defaults = {
+      wrapAround: true,
+      pageDots: false,
+      cellAlign: 'left'
     }
 
-}; // end SliderInit
+    settings = $.extend({}, defaults, options)
+
+    if (this.hasSlides(settings.cellSelector)) {
+      this.slider = new Flickity(wrapper, settings)
+
+      this.slider = Flickity.data(wrapper)
+    }
+
+    return this
+  }
+} // end SliderInit
 
 /**
  * @module setUpMainSlider
  * @class setUpMainSlider
- * @param  {Object} app       App global module
- * @param  {Object} o 		  Object
- * @return {Object}           Public API
+ * @param  {Object} app App global module
+ * @param  {Object} o Object
+ * @return {Object}   Public API
  */
-MTRK.setUpMainSlider = (function(app, o) {
+MTRK.setUpMainSlider = (function (app, o) {
+  app.mainSlider = o.create(MTRK.SliderInit, {})
 
-    "use strict";
+  app.mainSlider.init('.slider-wrapper', {
+    cellSelector: '.slider__el',
+    setGallerySize: false,
+    pageDots: false,
+    lazyLoad: true
+  })
 
-    app.mainSlider = o.create(MTRK.SliderInit, {});
+  app.mainSlider.setBGImage = function (event, cellElement) {
+    cellElement.style.backgroundImage = `url(${event.target.src})`
 
-    app.mainSlider.init(".slider-wrapper", {
-        cellSelector: ".slider__el",
-        setGallerySize: false,
-        pageDots: false,
-        lazyLoad: true
-    });
+    cellElement.style.opacity = 1
+  }
 
-    app.mainSlider.setBGImage = function(event, cellElement) {
-
-        cellElement.style.backgroundImage = "url(" + event.target.src + ")";
-
-        cellElement.style.opacity = 1;
-
-    };
-
-    app.mainSlider.eventListener = function() {
-
-        this.slider.on("lazyLoad", this.setBGImage.bind(this));
-
-    };
-
-})(MTRK, Object); // end setUpMainSlider
+  app.mainSlider.eventListener = function () {
+    this.slider.on('lazyLoad', this.setBGImage.bind(this))
+  }
+})(MTRK, Object) // end setUpMainSlider
 
 /**
  * @module MTRK
@@ -502,284 +402,233 @@ MTRK.setUpMainSlider = (function(app, o) {
  * @param  {Object} w         window object
  * @return {Object}           Public API
  */
-MTRK.Tabs = (function(events, w) {
-
-    "use strict";
-
-    var $target,
-        $tabsWrapper,
-        $tabsContentWrapper,
-        $tabs,
-        $panels,
-        targets,
-        activeClass,
-        eventSelected,
-        tween,
-        _setMinSize,
-        _setUpTargets,
-        _setUpPanels,
-        _update,
-        _show,
-        _broadCastEvent,
-        _handleTabClick,
-        _evtListener,
-        _gatherElements,
-        _init;
-
-    activeClass = "is-selected";
-
-    eventSelected = events.tabs.selected;
-
-    // a temp value to cache *what* we're about to show
-    $target = null;
-
-    tween = new TimelineLite();
-
-    _setUpTargets = function() {
-
-        // get an array of the panel ids (from the anchor hash)
-        targets = $tabs.map(function() {
-
-            return this.hash;
-
-        }).get();
-
-    };
-
-    _setUpPanels = function() {
-
-        // use those ids to get a jQuery collection of panels
-        $panels = $(targets.join(",")).each(function() {
-
-            // keep a copy of what the original el.id was
-            $(this).data("old-id", this.id);
-
-        });
-
-    };
-
-    _update = function _update() {
-
-        var hash = w.location.hash;
-
-        _broadCastEvent($tabsWrapper, hash);
-
-        if ($target) {
-
-            $target.attr("id", $target.data("old-id"));
-
-            $target = null;
-
-        }
-
-        if (targets.indexOf(hash) !== -1) {
-
-            _show(hash);
-
-        }
-
-    };
-
-    _show = function _show(id) {
-
-        // if no value was given, let's take the first panel
-        if (!id) {
-
-            id = targets[0];
-        }
-
-        // remove the selected class from the tabs,
-        // and add it back to the one the user selected
-        $tabs.removeClass(activeClass).filter(function() {
-
-            return (this.hash === id);
-
-        }).addClass(activeClass);
-
-        // now hide all the panels, then filter to
-        // the one we're interested in, and show it
-        tween
-            .set($panels, {
-                autoAlpha: 0,
-                display: "none",
-                scale: 1.1
-            })
-            .to($panels.filter(id), 1, {
-                autoAlpha: 1,
-                display: "block",
-                scale: 1,
-                clearProps: "scale"
-            });
-
-    };
-
-    _broadCastEvent = function(target, hash) {
-
-        $.Topic(eventSelected).publish(target, hash);
-
-    };
-
-    _handleTabClick = function() {
-
-        $tabsWrapper.on("click", $tabs.selector, function() {
-
-            $target = $(this.hash).removeAttr("id");
-
-            // if the URL isn't going to change, then hashchange
-            // event doesn't fire, so we trigger the update manually
-            if (w.location.hash === this.hash) {
-
-                setTimeout(_update, 0);
-
-            }
-
-        });
-
-    };
-
-    _setMinSize = function() {
-
-        $tabsContentWrapper.addClass("has-size");
-
-    };
-
-    _gatherElements = function() {
-
-        $tabsWrapper = $(".tabs__cmds");
-
-        $tabs = $tabsWrapper.find(".js-tab-cmd");
-
-        $tabsContentWrapper = $(".tabs__content-wrapper");
-
-    };
-
-    _evtListener = function _evtListener() {
-
-        _handleTabClick();
-
-        $(w)
-            .one("hashchange", _setMinSize)
-            .on("hashchange", _update);
-
-    };
-
-    _init = function _init() {
-
-        _gatherElements();
-
-        _setUpTargets();
-
-        _setUpPanels();
-
-        // initialise
-        if (targets.indexOf(w.location.hash) !== -1) {
-
-            _update();
-
-        } else {
-
-            _show();
-
-        }
-
-    };
-
-    return {
-
-        init: function() {
-
-            _init();
-
-            _evtListener();
-
-        }
-
-    };
-
-})(MTRK._EVENTS_, window); // end Tabs
+MTRK.Tabs = (function (events, w) {
+  let $target,
+    $tabsWrapper,
+    $tabsContentWrapper,
+    $tabs,
+    $panels,
+    targets,
+    activeClass,
+    eventSelected,
+    tween,
+    _setMinSize,
+    _setUpTargets,
+    _setUpPanels,
+    _update,
+    _show,
+    _broadCastEvent,
+    _handleTabClick,
+    _evtListener,
+    _gatherElements,
+    _init
+
+  activeClass = 'is-selected'
+
+  eventSelected = events.tabs.selected
+
+  // a temp value to cache *what* we're about to show
+  $target = null
+
+  tween = new TimelineLite()
+
+  _setUpTargets = function () {
+    // get an array of the panel ids (from the anchor hash)
+    targets = $tabs
+      .map(function () {
+        return this.hash
+      })
+      .get()
+  }
+
+  _setUpPanels = function () {
+    // use those ids to get a jQuery collection of panels
+    $panels = $(targets.join(',')).each(function () {
+      // keep a copy of what the original el.id was
+      $(this).data('old-id', this.id)
+    })
+  }
+
+  _update = function _update () {
+    const hash = w.location.hash
+
+    _broadCastEvent($tabsWrapper, hash)
+
+    if ($target) {
+      $target.attr('id', $target.data('old-id'))
+
+      $target = null
+    }
+
+    if (targets.indexOf(hash) !== -1) {
+      _show(hash)
+    }
+  }
+
+  _show = function _show (id) {
+    // if no value was given, let's take the first panel
+    if (!id) {
+      id = targets[0]
+    }
+
+    // remove the selected class from the tabs,
+    // and add it back to the one the user selected
+    $tabs
+      .removeClass(activeClass)
+      .filter(function () {
+        return this.hash === id
+      })
+      .addClass(activeClass)
+
+    // now hide all the panels, then filter to
+    // the one we're interested in, and show it
+    tween
+      .set($panels, {
+        autoAlpha: 0,
+        display: 'none',
+        scale: 1.1
+      })
+      .to($panels.filter(id), 1, {
+        autoAlpha: 1,
+        display: 'block',
+        scale: 1,
+        clearProps: 'scale'
+      })
+  }
+
+  _broadCastEvent = function (target, hash) {
+    $.Topic(eventSelected).publish(target, hash)
+  }
+
+  _handleTabClick = function () {
+    $tabsWrapper.on('click', $tabs.selector, function () {
+      $target = $(this.hash).removeAttr('id')
+
+      // if the URL isn't going to change, then hashchange
+      // event doesn't fire, so we trigger the update manually
+      if (w.location.hash === this.hash) {
+        setTimeout(_update, 0)
+      }
+    })
+  }
+
+  _setMinSize = function () {
+    $tabsContentWrapper.addClass('has-size')
+  }
+
+  _gatherElements = function () {
+    $tabsWrapper = $('.tabs__cmds')
+
+    $tabs = $tabsWrapper.find('.js-tab-cmd')
+
+    $tabsContentWrapper = $('.tabs__content-wrapper')
+  }
+
+  _evtListener = function _evtListener () {
+    _handleTabClick()
+
+    $(w)
+      .one('hashchange', _setMinSize)
+      .on('hashchange', _update)
+  }
+
+  _init = function _init () {
+    _gatherElements()
+
+    _setUpTargets()
+
+    _setUpPanels()
+
+    // initialise
+    if (targets.indexOf(w.location.hash) !== -1) {
+      _update()
+    } else {
+      _show()
+    }
+  }
+
+  return {
+    init () {
+      _init()
+
+      _evtListener()
+    }
+  }
+})(MTRK._EVENTS_, window) // end Tabs
 
 /**
  * @module MTRK
  * @class ToggleShareLayer
  * @param  {Object} app       App global module
- * @param  {Object} d 		  window.document
+ * @param  {Object} d window.document
  * @return {Object}           Public API
  */
-MTRK.ToggleShareLayer = (function(app, d) {
+MTRK.ToggleShareLayer = (function (app, d) {
+  let $root,
+    $elements,
+    openBtn,
+    closeBtn,
+    activeClass,
+    tween,
+    _openLayer,
+    _closeLayer,
+    _eventListener,
+    _init
 
-    "use strict";
+  openBtn = '.js-show-share-layer'
 
-    var $root,
-        $elements,
-        openBtn,
-        closeBtn,
-        activeClass,
-        tween,
-        _openLayer,
-        _closeLayer,
-        _eventListener,
-        _init;
+  closeBtn = '.js-close-share'
 
-    openBtn = ".js-show-share-layer";
+  $elements = $('.share-layer__btn-wrapper')
 
-    closeBtn = ".js-close-share";
+  $root = $('html')
 
-    $elements = $(".share-layer__btn-wrapper");
+  activeClass = 'is-share-shown'
 
-    $root = $("html");
+  tween = new TimelineLite({
+    paused: true,
+    onStart () {
+      $root.addClass(activeClass)
+    },
+    onReverseComplete () {
+      $root.removeClass(activeClass)
+    }
+  })
 
-    activeClass = "is-share-shown";
+  tween.staggerFrom(
+    $elements,
+    0.7, {
+      force3D: true,
+      scale: 0.5,
+      opacity: 0,
+      delay: 0.5,
+      ease: Power4.easeOut
+    },
+    0.2
+  )
 
-    tween = new TimelineLite({
-        paused: true,
-        onStart: function() {
-            $root.addClass(activeClass);
-        },
-        onReverseComplete: function() {
-            $root.removeClass(activeClass);
-        }
-    });
+  _closeLayer = function () {
+    tween.reverse()
+  }
 
-    tween.staggerFrom($elements, 0.7, {
-        force3D: true,
-        scale: 0.5,
-        opacity: 0,
-        delay: 0.5,
-        ease: Power4.easeOut,
-    }, 0.2);
+  _openLayer = function () {
+    tween.play()
+  }
 
-    _closeLayer = function() {
+  _eventListener = function () {
+    $(d)
+      .on('click', openBtn, _openLayer)
+      .on('click', closeBtn, _closeLayer)
+  }
 
-        tween.reverse();
+  _init = function () {
+    _eventListener()
+  }
 
-    };
-
-    _openLayer = function() {
-
-        tween.play();
-
-    };
-
-    _eventListener = function() {
-
-        $(d)
-            .on("click", openBtn, _openLayer)
-            .on("click", closeBtn, _closeLayer);
-    };
-
-    _init = function() {
-
-        _eventListener();
-
-    };
-
-    return {
-
-        init: _init
-
-    };
-
-})(MTRK, document); // end ToggleShareLayer
+  return {
+    init: _init
+  }
+})(MTRK, document) // end ToggleShareLayer
 
 /**
  * @module MTRK
@@ -793,109 +642,89 @@ MTRK.ToggleShareLayer = (function(app, d) {
  * @param  {Object} o         Native Object
  * @return {Object}           Public API
  */
-MTRK.ShowExternalContent = (function(app, layer, templates, d, o) {
+MTRK.ShowExternalContent = (function (app, layer, templates, d, o) {
+  let button,
+    overlay,
+    _getUrl,
+    _buildLayer,
+    _onXhrSuccess,
+    _onXhrError,
+    _showLayer,
+    _eventListener,
+    _init
 
-    "use strict";
+  overlay = o.create(layer, {})
 
-    var button,
-        overlay,
+  button = '.js-show-ext-layer'
 
-        _getUrl,
-        _buildLayer,
-        _onXhrSuccess,
-        _onXhrError,
-        _showLayer,
-        _eventListener,
-        _init;
+  _getUrl = function (el) {
+    return el.href
+  }
 
-    overlay = o.create(layer, {});
+  _onXhrSuccess = function (data) {
+    _buildLayer(data)
+  }
 
-    button = ".js-show-ext-layer";
+  _onXhrError = function () {
+    console.log('ShowExternalContent ajax error')
+    console.log(arguments)
+  }
 
-    _getUrl = function(el) {
+  _buildLayer = function (data) {
+    const tplData = {
+      content: data
+    }
 
-        return el.href;
+    overlay.init({
+      id: 'layer',
+      klass: 'is-textual',
+      dynamic: true,
+      tplData: tplData.content
+    })
+  }
 
-    };
+  _showLayer = function (evt) {
+    evt.preventDefault()
 
-    _onXhrSuccess = function(data) {
+    $.ajax({
+      url: _getUrl(evt.currentTarget)
+    }).then(_onXhrSuccess, _onXhrError)
+  }
 
-        _buildLayer(data);
+  _eventListener = function () {
+    $(d).on('click', button, _showLayer)
+  }
 
-    };
+  _init = function () {
+    _eventListener()
+  }
 
-    _onXhrError = function() {
-        console.log("ShowExternalContent ajax error");
-        console.log(arguments);
-    };
-
-    _buildLayer = function(data) {
-
-        var tplData = {
-            content: data
-        };
-
-        overlay.init({
-            id: "layer",
-            klass: "is-textual",
-            dynamic: true,
-            tplData: tplData.content
-        });
-
-    };
-
-    _showLayer = function(evt) {
-
-        evt.preventDefault();
-
-        $.ajax({
-            url: _getUrl(evt.currentTarget)
-        }).then(_onXhrSuccess, _onXhrError);
-
-    };
-
-    _eventListener = function() {
-
-        $(d).on("click", button, _showLayer);
-
-    };
-
-    _init = function() {
-
-        _eventListener();
-
-    };
-
-    return {
-
-        init: _init
-
-    };
-
-})(MTRK, MTRK.Layer, MTRK.HtmlTemplates, document, Object); // end ShowExternalContent
+  return {
+    init: _init
+  }
+})(MTRK, MTRK.Layer, MTRK.HtmlTemplates, document, Object) // end ShowExternalContent
 
 /**
  * @module MTRK
  * @class StartAnimation
  * @description Add some fanciness to selected elements
  */
-MTRK.StartAnimation = function() {
+MTRK.StartAnimation = function () {
+  let $elements = $('.slider__head__el')
+  let $icons = $('.tabs__icon')
 
-    "use strict";
-
-    var $elements = $(".slider__head__el"),
-        $icons = $(".tabs__icon");
-
-    TweenMax.staggerTo($elements, 1, {
-        y: 0,
-        scale: 1,
-        opacity: 1,
-        ease: Power4.easeOut
-    }, 0.25);
-
-    $icons.addClass("is-loaded");
-
-}; // end StartAnimation
+  TweenMax.staggerTo(
+    $elements,
+    1, {
+      y: 0,
+      scale: 1,
+      opacity: 1,
+      ease: Power4.easeOut
+    },
+    0.25
+  )
+  $icons.addClass('is-loaded')
+} // end StartAnimation
 
 /**
  * @module MTRK
@@ -903,20 +732,16 @@ MTRK.StartAnimation = function() {
  * @description App's entry point
  * @param {Object} app App global module
  */
-MTRK.Init = (function(app) {
+MTRK.Init = (function (app) {
+  app.StartAnimation()
 
-    "use strict";
+  app.mainSlider.init().eventListener()
 
-    app.StartAnimation();
+  app.Tabs.init()
 
-    app.mainSlider.init().eventListener();
+  app.ToggleShareLayer.init()
 
-    app.Tabs.init();
+  app.ShowExternalContent.init()
 
-    app.ToggleShareLayer.init();
-
-    app.ShowExternalContent.init();
-
-    app.handleGlobalAjax.init();
-
-})(MTRK);
+  app.handleGlobalAjax.init()
+})(MTRK)
