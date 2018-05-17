@@ -1,0 +1,83 @@
+/* === LAYER === */
+
+.loading {
+  width: 36px;
+  height: 36px;
+  margin: auto;
+  border-radius: 50%;
+  border-width: 6px;
+  border-style: solid;
+  border-color: #F89F1C rgba(0, 0, 0, 0);
+  -webkit-animation: spinner 1s linear infinite;
+  animation: spinner 1s linear infinite;
+}
+
+.layer.is-removing {
+  opacity: 0;
+}
+
+.is-dimmed {
+  overflow: visible;
+}
+
+.is-dimmed body {
+  overflow: hidden;
+}
+
+.is-textual .layer__inner {
+  background-color: #FFFFFF;
+}
+
+.is-textual .layer__content {
+  padding: 1em 2em;
+}
+
+.layer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2000;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, .4);
+  -webkit-transition: opacity .3s;
+  transition: opacity .3s;
+  -webkit-animation: fade .3s ease;
+  animation: fade .3s ease;
+}
+
+.layer__inner {
+  width: 70%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.layer__close {
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  right: 0.5em;
+  top: 0.5em;
+  background: url("../../img/close.svg") no-repeat transparent 0 0;
+  background-size: cover;
+  text-indent: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+.layer__inner .gallery__el {
+  width: 100%;
+}
+
+.layer__inner .do-share, .layer__inner .project__title {
+  display: block;
+}
+
+.layer__inner .do-like {
+  display: none;
+}

@@ -1,0 +1,225 @@
+/* ==============================================
+------------------ Media Queries -----------------
+=============================================== */
+
+@media screen and (max-width: 1366px) {
+  .slider-wrapper {
+    height: calc(100vh - 78px);
+    .slider__head {
+      max-width: 50%;
+    }
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .form__row.palm-layout--stacked{
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-flow: column wrap;
+            flex-flow: column wrap;
+            -webkit-column-count: 2;
+                    column-count: 2;
+  }
+  .u-2\/3 {
+    -ms-flex-preferred-size: 50%;
+        flex-basis: 50%;
+  }
+  .hero__media {
+    max-width: 60%;
+  }
+
+  #state {
+    padding: .60rem .75rem;
+    line-height: normal;
+  }
+  .form__row>.layout__item{
+    margin-right: 0;
+  }
+  .form__row:nth-child(2),
+  .form__row:last-child{
+    & .layout__item{
+      margin-right: 0;
+    }
+  }
+  #day,
+  #month {
+    margin-right: 1em;
+  }
+
+  #year {
+    margin-right: 0;
+  }
+}
+
+@media screen and (max-width:768px) {
+  .slider-wrapper {
+    height: calc(100vh - calc(60vh));
+    .slider__head {
+      max-width: 58%;
+    }
+  }
+  .mb-0{
+    margin-bottom:  0 !important;
+  }
+  .gallery__boxes .gallery-box {
+    padding: 0;
+    margin: 0 9px;
+    margin-bottom: 1.5em;
+  }
+  #day,
+  #month {
+    margin-right: 1em;
+  }
+
+  #year {
+    margin-right: 0;
+  }
+}
+
+@media screen and (max-width:720px) {
+  .slider-wrapper {
+    height: calc(100vh - 72vh);
+    .slider__head {
+      max-width: 100%;
+    }
+  }
+ 
+  #year{
+    margin-right: 0;
+  }
+
+}
+
+@media screen and  (max-width: 575px) {
+  .slider-wrapper {
+    height: calc(100vh - calc(32vh));
+    .slider__head {
+      max-width: 100%;
+    }
+  }
+  .main-footer .layout__item:last-child {
+    text-align: center;
+  }
+  .share__text{
+    visibility: hidden;
+  }
+  #state{
+    margin-bottom: 0;
+  }
+  .mh{
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+@media screen and (min-width: 320px) and (max-width: 480px) {
+  // Gallery
+  .slider-wrapper {
+    height: calc(100vh - calc(22vh));
+  }
+  .slider__head {
+    max-width: 100%;
+    .btn {
+      width: 100%;
+      ~ .btn {
+        margin-left: 0;
+      }
+      &:first-child {
+        margin-bottom: 1rem;
+      }
+    }
+  }
+  .flickity-prev-next-button {
+    z-index: 10;
+  }
+
+  // logo
+  .layout.layout--middle {
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -ms-flex-flow: row wrap;
+    flex-flow: row wrap;
+  }
+  #header__logo {
+    max-width: 175px;
+  }
+  .icon--dark {
+    font-size: 1.5rem;
+  }
+
+  // layout
+  .layout {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-flow: column wrap;
+    flex-flow: column wrap;
+    padding-right: 1px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+  }
+  .u-2\/3 {
+    -webkit-box-ordinal-group: 2;
+    -ms-flex-order: 1;
+    order: 1;
+  }
+  .u-1\/3 {
+    -webkit-box-ordinal-group: 3;
+    -ms-flex-order: 2;
+    order: 2;
+  }
+  // align car image
+  .hero__media {
+    max-width: 40%;
+    right: 8%;
+    top: 0;
+    float: right;
+  }
+
+  // Form elements
+  .form__row > .layout__item {
+    margin-right: 0;
+  }
+  select.form__el {
+    border-radius: 0;
+  }
+
+  #month,
+  #day,
+  #year,
+  #state
+   {
+    margin-bottom: 1em;
+    margin-left: 0;
+    margin-right: 0;
+    padding: .6rem .75rem;
+    line-height: 1;
+    height: 2.5em;
+  }
+  #year,
+  #state {
+    margin-bottom: 0;
+  }
+
+  // Footer
+  .main-footer {
+    .layout__item:last-child {
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      -ms-flex-flow: column wrap;
+      flex-flow: column wrap;
+      .footer__el {
+        margin: 0;
+        &:first-child {
+          margin-bottom: 10px
+        }
+      }
+    }
+  }
+}

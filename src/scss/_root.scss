@@ -1,0 +1,88 @@
+::-moz-selection {
+  background: $color_golden_yellow;
+  text-shadow: none;
+}
+
+::selection {
+  background: $color_golden_yellow;
+  text-shadow: none;
+}
+
+html {
+  @include singleFontRule(normal, 100%, 1.4, $ffamily);
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  -ms-overflow-style: none;
+  -webkit-transition: background-color 1.4s linear;
+  transition: background-color 1.4s linear;
+}
+
+.is-loading {
+  position: relative;
+  &::after,
+  &::before {
+    position: absolute;
+    z-index: 20;
+  }
+  &::before {
+    content: "";
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+
+  &::after {
+    content: "";
+    width: 36px;
+    height: 36px;
+    left: 50%;
+    top: 50%;
+    margin: -18px 0 0 -18px;
+    border-radius: 50%;
+    border-width: 6px;
+    border-style: solid;
+    border-color: $color_golden_yellow rgba(0, 0, 0, 0);
+    -webkit-animation: spinner 1s linear infinite;
+    animation: spinner 1s linear infinite;
+  }
+}
+
+img {
+  vertical-align: bottom;
+}
+
+a:link {
+  word-wrap: break-word;
+}
+
+a,
+button,
+label {
+  cursor: pointer;
+}
+
+b,
+strong {
+  font-weight: 700;
+}
+
+button:focus {
+  outline: 0 none;
+}
+
+svg,
+img,
+.btn,
+.form__el,
+.project__actions {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+svg {
+  max-width: 100%;
+}

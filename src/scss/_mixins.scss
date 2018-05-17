@@ -1,0 +1,13 @@
+@import 'flexMixin';
+
+@mixin fontRule($size, $lheight, $weight, $family, $color) {
+  font-family: $family;
+  font-size: $size;
+  font-weight: $weight;
+  line-height: $lheight;
+  color: $color;
+}
+
+@mixin singleFontRule($weight, $size, $lheight, $family) {
+  font: $weight $size/$lheight $family;
+}

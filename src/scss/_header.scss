@@ -1,0 +1,26 @@
+/* === HEADER === */
+
+.logo, .logo__media {
+  display: block;
+}
+
+.share__text {
+  text-transform: uppercase;
+  margin-right: 1em;
+  position: relative;
+}
+
+.share__text::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  border-bottom: 1px solid;
+  -webkit-transform: scaleX(0);
+  transform: scaleX(0);
+  -webkit-transition: -webkit-transform .75s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+  transition: -webkit-transform .75s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+  transition: transform .75s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+  transition: transform .75s cubic-bezier(0.645, 0.045, 0.355, 1.000), -webkit-transform .75s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+}

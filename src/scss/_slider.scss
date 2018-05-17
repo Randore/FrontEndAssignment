@@ -1,0 +1,74 @@
+/* === MAIN SLIDER === */
+
+.slider-wrapper {
+  height: calc(100vh - 78px);
+  position: relative;
+  .slider__el {
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    -webkit-transition: opacity 1.5s ease-out;
+    transition: opacity 1.5s ease-out;
+  }
+
+  .slider__media {
+    visibility: hidden;
+  }
+}
+
+.slider__head {
+  max-width: 75%;
+  position: absolute;
+  left: 10%;
+  top: 50%;
+  z-index: 2;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  background-color: rgba(255, 255, 255, 0.4);
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
+  .slider__head__el {
+    opacity: 0;
+    -webkit-transform: matrix(0.5, 0, 0, 0.5, 0, -22);
+    transform: matrix(0.5, 0, 0, 0.5, 0, -22);
+  }
+}
+
+/* === OVERRIDE FLICKITY BUTTONS */
+
+.flickity-prev-next-button {
+  background: rgba(0, 0, 0, 0);
+  -webkit-transition: background-color 0.3s;
+  transition: background-color 0.3s;
+}
+
+/* === STICKY SHOWCASE TEXT / FIXED STICKY PLUGIN === */
+
+.fixedsticky {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+}
+
+/* When position: sticky is supported but native behavior is ignored */
+
+.fixedsticky-withoutfixedfixed .fixedsticky-off,
+.fixed-supported .fixedsticky-off {
+  position: static;
+}
+
+.fixedsticky-withoutfixedfixed .fixedsticky-on,
+.fixed-supported .fixedsticky-on {
+  position: fixed;
+}
+
+.fixedsticky-dummy {
+  display: none;
+}
+
+.fixedsticky-on + .fixedsticky-dummy {
+  display: block;
+}

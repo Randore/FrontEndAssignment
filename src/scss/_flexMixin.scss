@@ -1,0 +1,53 @@
+// Flex @Mixins
+@mixin flexbox() {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+@mixin flex-wrap($wrap) {
+  -ms-flex-wrap: $wrap;
+      flex-wrap: $wrap;
+}
+
+@mixin flex-flow($flow) {
+  -ms-flex-flow: $flow;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+          flex-flow: $flow;
+}
+
+@mixin order($val) {
+  -webkit-box-ordinal-group: $val;
+  	     -ms-flex-order: $val;
+  		      order: $val;
+}
+
+@mixin justify-content($justify) {
+  -moz-justify-content: $justify;
+   -ms-justify-content: $justify;
+       -webkit-box-pack: $justify;
+          justify-content: $justify;
+            -ms-flex-pack: $justify;
+}
+
+@mixin align-content($align) {
+  -ms-align-content: $align;
+      -ms-flex-line-pack: $align;
+      align-content: $align;
+}
+
+@mixin align-items($align) {
+  -moz-align-items: $align;
+   -ms-align-items: $align;
+       -webkit-box-align: $align;
+           -ms-flex-align: $align;
+          align-items: $align;
+}
+
+@mixin align-self($align) {
+  -webkit-align-self: $align;
+      -ms-align-self: $align;
+          -ms-flex-item-align: $align;
+      align-self: $align;
+}

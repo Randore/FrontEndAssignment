@@ -1,0 +1,52 @@
+/* === FOOTER === */
+
+/* === SHARE LAYER === */
+
+.share-layer {
+  background-color: $color_share_layer;
+  padding: 1em;
+  position: absolute;
+  width: 100%;
+  z-index: 2;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transform: translateY(-100%);
+  transform: translateY(-100%);
+  -webkit-transition: -webkit-transform .7s cubic-bezier(1.000, 0.000, 0.000, 1.000);
+  transition: -webkit-transform .7s cubic-bezier(1.000, 0.000, 0.000, 1.000);
+  transition: transform .7s cubic-bezier(1.000, 0.000, 0.000, 1.000);
+  transition: transform .7s cubic-bezier(1.000, 0.000, 0.000, 1.000), -webkit-transform .7s cubic-bezier(1.000, 0.000, 0.000, 1.000);
+}
+
+.is-share-shown {
+  background-color: $color_share_layer;
+  overflow: hidden;
+}
+
+.is-share-shown .share-layer {
+  -webkit-transform: translateY(0);
+  transform: translateY(0);
+}
+
+.is-share-shown .main-content, .is-share-shown .main-footer {
+  -webkit-transform: scale(.9);
+  transform: scale(.9);
+  -webkit-filter: blur(2px);
+}
+
+.is-share-shown .main-content::after {
+  z-index: 20;
+  opacity: 1;
+}
+
+.share-layer__close {
+  position: absolute;
+  right: 1em;
+  top: 1em;
+  z-index: 10;
+}
+
+.share-layer__btn-wrapper {
+  text-align: center;
+  margin: 1em auto;
+}

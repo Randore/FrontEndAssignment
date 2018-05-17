@@ -1,0 +1,107 @@
+/* === TABS === */
+
+.tabs {
+  background-color: rgba(255, 255, 255, 0.8);
+  position: relative;
+
+  .tabs__cmds {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+  }
+
+  .tabs__cmd {
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    font-family: $ffamily;
+    text-transform: uppercase;
+    text-align: center;
+    position: relative;
+    -webkit-transition: background 0.2s cubic-bezier(1, 0, 0, 1),
+      color 0.4s 0.1s cubic-bezier(1, 0, 0, 1);
+    transition: background 0.2s cubic-bezier(1, 0, 0, 1),
+      color 0.4s 0.1s cubic-bezier(1, 0, 0, 1);
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      border-top: 2px solid #212428;
+      -webkit-transform: scaleX(0.4);
+      transform: scaleX(0.4);
+      -webkit-transition: border-color 0.5s cubic-bezier(1, 0, 0, 1),
+        -webkit-transform 0.3s cubic-bezier(1, 0, 0, 1);
+      transition: border-color 0.5s cubic-bezier(1, 0, 0, 1),
+        -webkit-transform 0.3s cubic-bezier(1, 0, 0, 1);
+      transition: border-color 0.5s cubic-bezier(1, 0, 0, 1),
+        transform 0.3s cubic-bezier(1, 0, 0, 1);
+      transition: border-color 0.5s cubic-bezier(1, 0, 0, 1),
+        transform 0.3s cubic-bezier(1, 0, 0, 1),
+        -webkit-transform 0.3s cubic-bezier(1, 0, 0, 1);
+    }
+    &.is-selected {
+      color: $color_golden_yellow;
+      background-color: $color_white;
+      &::before {
+        border-top-color: rgba(0, 0, 0, 0);
+        -webkit-transform: scaleX(1);
+        transform: scaleX(1);
+      }
+      &.tabs__icon {
+        stroke-width: 0;
+        stroke-dashoffset: 0;
+        fill: currentColor;
+      }
+    }
+    & > svg {
+      display: block;
+      height: auto;
+      margin: auto;
+    }
+  }
+
+  .tabs__icon {
+    stroke: currentColor;
+    stroke-width: 2px;
+    fill: transparent;
+    -webkit-transition: stroke-dashoffset 3s 0.5s cubic-bezier(1, 0, 0, 1),
+      stroke-width 0.3s, fill 0.3s;
+    transition: stroke-dashoffset 3s 0.5s cubic-bezier(1, 0, 0, 1),
+      stroke-width 0.3s, fill 0.3s;
+    &.is-loaded {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .tabs__icon--partecipate {
+    stroke-dasharray: 860;
+    stroke-dashoffset: 860;
+  }
+
+  .tabs__icon--gallery {
+    stroke-dasharray: 490;
+    stroke-dashoffset: 490;
+  }
+
+  .tabs__icon--showcase {
+    stroke-dasharray: 335;
+    stroke-dashoffset: 335;
+  }
+
+  .tabs__title {
+    display: block;
+    margin-bottom: 0.5em;
+  }
+
+  .tabs__content {
+    display: none;
+    width: 100%;
+    padding: 2em 1em;
+  }
+
+  .tabs__content .layout__item {
+    min-width: 0;
+  }
+}

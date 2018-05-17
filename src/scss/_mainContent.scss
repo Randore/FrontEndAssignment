@@ -1,0 +1,87 @@
+/* === PAGE ELEMENTS === */
+
+.main-content {
+  overflow: hidden;
+}
+
+.main-content::after {
+  content: "";
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  z-index: -1;
+  right: 0;
+  top: 0;
+  background-color: rgba(0, 0, 0, .6);
+  /*transform: scale(1.2);*/
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transition: z-index .7s linear, opacity 1s ease-out;
+  transition: z-index .7s linear, opacity 1s ease-out;
+}
+
+.main-content, .main-footer {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transition: transform .7s cubic-bezier(1.000, 0.000, 0.000, 1.000), -webkit-filter .7s cubic-bezier(1.000, 0.000, 0.000, 1.000);
+}
+
+.main-header, .main-footer {
+  padding: 1rem;
+}
+
+.main-header {
+  color: #212428;
+}
+
+.main-footer {
+  color: #FFFFFF;
+  background-color: #212428;
+}
+
+.link__deco {
+  border-bottom: 1px solid;
+}
+
+
+/* === HERO === */
+
+.svg-wrapper, .shape-wrapper {
+  position: absolute;
+}
+
+.hero__media {
+  max-width: 40%;
+  left: 50%;
+  top: 50%;
+}
+
+.shape-wrapper, .shape {
+  width: 100%;
+  height: 100%;
+}
+
+.svg-wrapper {
+  top: 0;
+  left: 10%;
+  width: 50%;
+  height: 0;
+  padding-bottom: 50%;
+}
+
+.shape {
+  stroke-dasharray: 140 1290;
+  stroke-dashoffset: -474;
+  stroke-width: 0.75rem;
+  fill: transparent;
+  stroke: rgba(248, 159, 28, 1);
+  -webkit-transition: stroke-dashoffset 1s, stroke-dasharray 1s;
+  transition: stroke-dashoffset 1s, stroke-dasharray 1s;
+}
+
+.svg-wrapper.is-visible .shape {
+  stroke-dashoffset: 0;
+  stroke-dasharray: 1290;
+}
